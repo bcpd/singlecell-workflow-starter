@@ -13,7 +13,7 @@ It is meant to provide:
 - A small, auditable Nextflow wrapper around Seurat and Scanpy analyses.
 - A shared input contract for one or more 10x matrix directories.
 - Stable output files across engines, including metadata, marker tables, objects, plots, run summaries, and manifests.
-- CI-friendly smoke tests using a tiny deterministic 10x fixture.
+- CI-friendly smoke tests using a tiny deterministic 10x test dataset.
 - Clear boundaries with upstream count-generation tools instead of reimplementing nf-core/scrnaseq or Cell Ranger.
 
 ## Repository layout
@@ -30,7 +30,7 @@ It is meant to provide:
 ├── R/                              # Seurat modules
 ├── python/                         # Scanpy modules and shared utilities
 ├── envs/                           # Conda environment specs
-└── tests/                          # Unit tests and tiny 10x fixture
+└── tests/                          # Unit tests and tiny 10x test dataset
 ```
 
 ## Quick start
@@ -145,8 +145,8 @@ Run lightweight tests:
 pytest
 ```
 
-The test suite includes unit tests for shared utilities and contract checks against a deterministic tiny 10x fixture in `tests/fixtures/tiny_10x/`.
+The test suite includes unit tests for shared utilities and contract checks against a deterministic tiny 10x test dataset in `tests/fixtures/tiny_10x/`.
 
 ## Data policy
 
-Do not commit raw FASTQ files, large `.h5ad` files, large `.rds` files, or generated result directories. Commit scripts, configs, small fixtures, summary tables, documentation, and reproducibility metadata.
+Do not commit raw FASTQ files, large `.h5ad` files, large `.rds` files, or generated result directories. Commit scripts, configs, small test datasets, summary tables, documentation, and reproducibility metadata.

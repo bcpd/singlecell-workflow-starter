@@ -1,0 +1,48 @@
+# Productionize Core Downstream scRNA-seq Starter
+
+## Summary
+- First milestone: productionize the downstream workflow from existing 10x filtered matrices; keep raw FASTQ processing delegated to nf-core/scrnaseq documentation/examples.
+- Keep **Seurat and Scanpy as first-class paths** with aligned output contracts, not numerically identical results.
+- Support human and mouse 10x GEX inputs with configurable mitochondrial gene prefix and QC thresholds.
+- Make reproducibility explicit through locked environments, pinned containers, deterministic fixtures, and CI smoke tests.
+
+## Key Changes
+- Update [main.nf](/Users/pedrodimitriu/repos/single-cell-workflows-starter/main.nf) to use a canonical samplesheet input:
+  - Required columns: `sample`, `matrix_dir`.
+  - Optional columns: `species`, `genome`, `mt_prefix`.
+  - Defaults: `species=human`, `mt_prefix=MT-`; mouse default is `mt-`.
+  - Keep `--matrix_dir` + `--sample` as single-sample compatibility input.
+  - Remove the misleading `--run_cellranger` behavior from the local workflow.
+- Standardize the output contract under `<outdir>/<sample>/<engine>/`:
+  - `cell_metadata_prefilter.csv`
+  - `cell_metadata.csv`
+  - `cluster_markers.csv`
+  - `run_summary.json`
+  - `output_manifest.json`
+  - `plots/`
+  - `objects/<sample>.h5ad` for Scanpy and `objects/<sample>.rds` for Seurat.
+- Update the Seurat and Scanpy CLIs to accept the same production parameters:
+  - `--sample`, `--input`, `--outdir`, `--species`, `--mt-prefix`, `--min-features`, `--max-features`, `--max-mt`, `--cluster-resolution`.
+  - Include package versions, input path, thresholds, cell/gene counts, cluster count, and contract version in `run_summary.json`.
+- Add reproducibility assets:
+  - Generate and commit `conda-lock` files for Linux and macOS ARM where practical.
+  - Replace generic Docker profile images with project-specific pinned images built from the locked environments.
+  - Add checksum validation to public demo data downloads.
+- Update docs:
+  - Rewrite the README quick start around samplesheet-driven downstream analysis.
+  - Add an output contract document.
+  - Keep Cell Ranger and nf-core as documented upstream count-generation options, not local production code.
+
+## Test Plan
+- Add a tiny deterministic 10x fixture checked into `tests/fixtures/tiny_10x/` with `matrix.mtx.gz`, `barcodes.tsv.gz`, and `features.tsv.gz`.
+- Add tests for samplesheet validation, species/mitochondrial-prefix defaults, output manifest generation, and output schema checks.
+- Add Scanpy integration CI using the fixture and locked Python environment.
+- Add Seurat integration CI using the fixture and locked R environment.
+- Add a Nextflow smoke test that runs both engines against the fixture and asserts the full output contract exists.
+- Keep lightweight utility tests for fast feedback on every PR.
+
+## Assumptions
+- Raw FASTQ-to-count generation is out of scope for milestone 1 except documentation and nf-core example cleanup.
+- The stable public interface is the samplesheet plus output contract, not internal script implementation details.
+- Cross-engine parity means equivalent files and biological workflow stages; exact cluster assignments or marker rankings are not required to match.
+- All current outputs remain supported, but `run_summary.json` and `output_manifest.json` become the canonical machine-readable artifacts.
