@@ -4,6 +4,18 @@ This repository is a reusable downstream scRNA-seq starter for existing 10x filt
 
 Raw FASTQ-to-count generation is intentionally out of scope for the local workflow. Use nf-core/scrnaseq or Cell Ranger upstream, then pass the resulting filtered matrix directories into this starter.
 
+## Gap this fills
+
+Many single-cell examples show either a one-off notebook or a full FASTQ-to-count production pipeline. This starter focuses on the middle layer: taking existing count matrices and turning them into reproducible downstream analysis outputs that are easy to test, compare, and hand off.
+
+It is meant to provide:
+
+- A small, auditable Nextflow wrapper around Seurat and Scanpy analyses.
+- A shared input contract for one or more 10x matrix directories.
+- Stable output files across engines, including metadata, marker tables, objects, plots, run summaries, and manifests.
+- CI-friendly smoke tests using a tiny deterministic 10x fixture.
+- Clear boundaries with upstream count-generation tools instead of reimplementing nf-core/scrnaseq or Cell Ranger.
+
 ## Repository layout
 
 ```text
