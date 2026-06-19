@@ -1,0 +1,20 @@
+name: singlecell-python
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.11
+  - pip
+  - scanpy
+  - anndata
+  - pandas
+  - numpy
+  - scipy
+  - matplotlib
+  - scikit-learn
+  - leidenalg
+  - python-igraph
+  - louvain
+  - pytest
+  - pip:
+      - celltypist

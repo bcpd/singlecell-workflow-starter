@@ -1,0 +1,17 @@
+name: singlecell-r
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - r-base=4.4
+  - r-essentials
+  - r-optparse
+  - r-ggplot2
+  - r-dplyr
+  - r-patchwork
+  - r-jsonlite
+  - r-remotes
+  - r-seurat
+  - bioconductor-singlecellexperiment
+  - bioconductor-scran
+  - bioconductor-scater

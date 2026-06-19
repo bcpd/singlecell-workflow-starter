@@ -1,0 +1,25 @@
+# Large data and intermediate results.
+data/raw/*
+data/processed/*
+results/*
+reports/*
+
+# Keep directory placeholders.
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!results/.gitkeep
+!reports/.gitkeep
+
+# R/Python artifacts.
+.Rhistory
+.RData
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+.env/
+
+# Nextflow artifacts.
+.nextflow*
+work/
+*.log

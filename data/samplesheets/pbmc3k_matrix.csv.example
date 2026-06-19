@@ -1,0 +1,2 @@
+sample,matrix_dir
+pbmc3k,data/raw/pbmc3k/filtered_gene_bc_matrices/hg19

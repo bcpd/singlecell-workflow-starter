@@ -1,0 +1,2 @@
+sample,fastqs,transcriptome,expected_cells,chemistry
+pbmc1k,/absolute/path/to/pbmc1k_fastqs,/absolute/path/to/refdata-gex-GRCh38-2024-A,1000,auto
