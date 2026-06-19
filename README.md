@@ -2,7 +2,27 @@
 
 This repository is a reusable downstream scRNA-seq starter for existing 10x filtered matrices. It keeps Seurat and Scanpy as first-class analysis engines with aligned output contracts, reproducible environments, lightweight tests, and a small Nextflow orchestration layer.
 
-Raw FASTQ-to-count generation is intentionally out of scope for the local workflow. Use nf-core/scrnaseq or Cell Ranger upstream, then pass the resulting filtered matrix directories into this starter.
+Raw FASTQ-to-count generation is intentionally out of scope for the local workflow. Use nf-core/scrnaseq or Cell Ranger first, then pass the resulting filtered matrix directories into this starter.
+
+## Workflow order
+
+This repo starts after count generation:
+
+```text
+FASTQ files
+  -> nf-core/scrnaseq or Cell Ranger
+  -> filtered 10x count matrix directory
+  -> this repo's Nextflow pipeline
+  -> Seurat and Scanpy downstream outputs
+```
+
+In this README, "upstream" means the count-generation step that happens before this workflow. For production FASTQ-to-count processing, prefer nf-core/scrnaseq:
+
+```bash
+bash scripts/run_nfcore_scrnaseq_example.sh
+```
+
+The Cell Ranger shell script is only an example command wrapper because Cell Ranger licensing and installation are project-specific.
 
 ## Gap this fills
 
@@ -126,16 +146,6 @@ bash scripts/generate_conda_locks.sh
 ```
 
 The lock script targets `linux-64` and `osx-arm64`.
-
-## Upstream count generation
-
-For production FASTQ-to-count processing, prefer nf-core/scrnaseq:
-
-```bash
-bash scripts/run_nfcore_scrnaseq_example.sh
-```
-
-The Cell Ranger shell script is only an example command wrapper because Cell Ranger licensing and installation are project-specific.
 
 ## Tests
 
