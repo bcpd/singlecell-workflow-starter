@@ -23,6 +23,12 @@ Raw FASTQ-to-count generation is intentionally out of scope for the local workfl
 
 ## Quick start
 
+Use Nextflow 26.0.0 or newer for this workflow:
+
+```bash
+nextflow -version
+```
+
 Create the Python and R environments:
 
 ```bash

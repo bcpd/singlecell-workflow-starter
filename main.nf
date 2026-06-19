@@ -27,45 +27,6 @@ def defaultMtPrefix(species, mtPrefix) {
     return "MT-"
 }
 
-if (!params.samplesheet && !params.matrix_dir) {
-    error "Provide --samplesheet with sample,matrix_dir columns or provide --matrix_dir with --sample for one sample."
-}
-
-if (params.samplesheet && params.matrix_dir) {
-    log.warn "Both --samplesheet and --matrix_dir were provided. Using --samplesheet and ignoring single-sample flags."
-}
-
-if (params.samplesheet) {
-    Channel
-        .fromPath(params.samplesheet)
-        .ifEmpty { error "Samplesheet not found: ${params.samplesheet}" }
-        .splitCsv(header: true)
-        .map { row ->
-            def sample = cleanValue(row.sample)
-            def matrixDir = cleanValue(row.matrix_dir)
-            if (!sample || !matrixDir) {
-                error "Samplesheet rows must include non-empty sample and matrix_dir values."
-            }
-
-            def species = cleanValue(row.species, params.species)
-            def genome = cleanValue(row.genome, params.genome)
-            def mtPrefix = defaultMtPrefix(species, row.mt_prefix)
-            tuple(sample, file(matrixDir), species, genome, mtPrefix)
-        }
-        .set { ch_matrix }
-} else {
-    def sample = cleanValue(params.sample)
-    if (!sample) {
-        error "Provide a non-empty --sample when using --matrix_dir."
-    }
-    def species = cleanValue(params.species, "human")
-    def genome = cleanValue(params.genome)
-    def mtPrefix = defaultMtPrefix(species, params.mt_prefix)
-    Channel
-        .of(tuple(sample, file(params.matrix_dir), species, genome, mtPrefix))
-        .set { ch_matrix }
-}
-
 process RUN_SEURAT {
     tag "${sample}"
 
@@ -153,6 +114,47 @@ process RUN_SCANPY {
 }
 
 workflow {
+    def nextflowMajor = nextflow.version.toString().tokenize(".")[0] as Integer
+    if (nextflowMajor < 26) {
+        error "This workflow requires Nextflow 26.0.0 or newer; detected ${nextflow.version}."
+    }
+
+    if (!params.samplesheet && !params.matrix_dir) {
+        error "Provide --samplesheet with sample,matrix_dir columns or provide --matrix_dir with --sample for one sample."
+    }
+
+    if (params.samplesheet && params.matrix_dir) {
+        log.warn "Both --samplesheet and --matrix_dir were provided. Using --samplesheet and ignoring single-sample flags."
+    }
+
+    if (params.samplesheet) {
+        ch_matrix = Channel
+            .fromPath(params.samplesheet)
+            .ifEmpty { error "Samplesheet not found: ${params.samplesheet}" }
+            .splitCsv(header: true)
+            .map { row ->
+                def sample = cleanValue(row.sample)
+                def matrixDir = cleanValue(row.matrix_dir)
+                if (!sample || !matrixDir) {
+                    error "Samplesheet rows must include non-empty sample and matrix_dir values."
+                }
+
+                def species = cleanValue(row.species, params.species)
+                def genome = cleanValue(row.genome, params.genome)
+                def mtPrefix = defaultMtPrefix(species, row.mt_prefix)
+                tuple(sample, file(matrixDir), species, genome, mtPrefix)
+            }
+    } else {
+        def sample = cleanValue(params.sample)
+        if (!sample) {
+            error "Provide a non-empty --sample when using --matrix_dir."
+        }
+        def species = cleanValue(params.species, "human")
+        def genome = cleanValue(params.genome)
+        def mtPrefix = defaultMtPrefix(species, params.mt_prefix)
+        ch_matrix = Channel.of(tuple(sample, file(params.matrix_dir), species, genome, mtPrefix))
+    }
+
     // Run both downstream analyses from the same count matrix.
     RUN_SEURAT(ch_matrix)
     RUN_SCANPY(ch_matrix)
